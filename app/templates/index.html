@@ -16,14 +16,20 @@
                             <div class="col-md-8" >
                                 <h5 class="card-title">{{product.name}}</h5>
                                 <p class="card-text">{{product.description}}</p>
-                                <p class="card-sprice">Starting Amount: {{product.sprice}}</p>
-                                <p class="card-cprice">Last Bit Amount: {{product.cprice}}</p>
+                                <p class="card-sprice">Starting Amount: {{product.starting_price}}</p>
+                                <p class="card-cprice">Last Bid Amount: 
+                                    {% if product.bids.last %}
+                                        {{ product.bids.last.bid_price }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </p>
                                 <div class="d-flex justify-content-between">
                                     <p class="card-text">Starting date: {{product.created_at}}</p>
                                     <p class="card-text">Closing date: {{product.end_time}}</p>
                                </div>
                                 <div class="d-flex justify-content-between">
-                                     <a href="./details">Read More</a>
+                                     <a href="{% url "details" pk=product.id %}">Read More</a>
                                     <a class="text-decoration-none text-dark fw-bold" href="#">Sports</a>
                                 </div>
                             </div>

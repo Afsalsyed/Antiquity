@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect # type: ignore
 from django.http import HttpResponse  # type: ignore
-from .models import Product
-from .forms import ProductForm
+from .models import Product, Bid
+from .forms import ProductForm, BidForm
 from django.contrib import messages # type: ignore
 
 
@@ -10,8 +10,22 @@ def home(request):
     products = Product.objects.all()
     return render(request, 'index.html', {'products': products})
 
-def details(request):
-    return render(request, "details.html")
+def details(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    bids = product.bids.all()
+    if request.method == 'POST':
+        form = BidForm(request.POST)
+        if form.is_valid():
+            bid = form.save(commit=False)
+            bid.product = product
+            bid.user = request.user
+            bid.save()
+            return redirect('details', pk=product.pk)
+    else:
+        form = BidForm()
+    last_bid = bids.first() if bids.exists() else None
+    return render(request, 'details.html', {'product': product, 'bids': bids, 'form': form, 'last_bid': last_bid})
+    
 
 def post_product(request):
     if request.method == 'POST':
