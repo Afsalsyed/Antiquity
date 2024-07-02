@@ -1,0 +1,11 @@
+/* .success {
+    color: green;
+}
+.error {
+    color: red;
+} */
+
+
+.form-control[type="date"] {
+    width: 150px; /* Adjust the width as needed */
+  }

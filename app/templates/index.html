@@ -11,7 +11,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-4" >
-                                <img src="https://via.placeholder.com/300" class="img-fluid" alt="...">
+                                <img src="{{product.image.url}}" class="img-fluid" alt="...">
                             </div>
                             <div class="col-md-8" >
                                 <h5 class="card-title">{{product.name}}</h5>
@@ -19,8 +19,8 @@
                                 <p class="card-sprice">Starting Amount: {{product.sprice}}</p>
                                 <p class="card-cprice">Last Bit Amount: {{product.cprice}}</p>
                                 <div class="d-flex justify-content-between">
-                                    <p class="card-text">Starting date: 12/45/5255</p>
-                                    <p class="card-text">Closing date: 21/45/5255</p>
+                                    <p class="card-text">Starting date: {{product.created_at}}</p>
+                                    <p class="card-text">Closing date: {{product.end_time}}</p>
                                </div>
                                 <div class="d-flex justify-content-between">
                                      <a href="./details">Read More</a>
