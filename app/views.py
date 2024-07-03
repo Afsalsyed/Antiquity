@@ -3,7 +3,9 @@ from django.http import HttpResponse  # type: ignore
 from .models import Product, Bid
 from .forms import ProductForm, BidForm
 from django.contrib import messages # type: ignore
-
+from django.contrib.auth import login, authenticate, logout # type: ignore
+from django.contrib.auth.forms import AuthenticationForm # type: ignore
+from .forms import SignUpForm
 
 # Create your views here.
 def home(request):
@@ -49,3 +51,43 @@ def post_product(request):
     else:
         form = ProductForm()
     return render(request, 'post_product.html', {'form': form})
+
+def my_listings(request):
+    products = Product.objects.filter(user=request.user)
+    return render(request, 'my_listings.html', {'products': products})
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('home')
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
+
+def user_login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('home')
+            else:
+                messages.error(request, 'Invalid username or password.')
+        else:
+            messages.error(request, 'Invalid username or password.')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})
+
+def user_logout(request):
+    logout(request)
+    return redirect('home')
