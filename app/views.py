@@ -13,17 +13,25 @@ def home(request):
 def details(request, pk):
     product = get_object_or_404(Product, pk=pk)
     bids = product.bids.all()
+    last_bid = bids.order_by('-created_at').first() if bids.exists() else None
+
     if request.method == 'POST':
         form = BidForm(request.POST)
         if form.is_valid():
-            bid = form.save(commit=False)
-            bid.product = product
-            bid.user = request.user
-            bid.save()
-            return redirect('details', pk=product.pk)
+            new_bid = form.cleaned_data['bid_price']
+            if (last_bid and new_bid <= last_bid.bid_price) or new_bid <= product.starting_price:
+                messages.error(request, 'The new bid must be higher than the last bid and the starting price.')
+            else:
+                bid = form.save(commit=False)
+                bid.product = product
+                bid.user = request.user
+                bid.save()
+                messages.success(request, 'Bid placed successfully!')
+                return redirect('details', pk=product.pk)
+        else:
+            messages.error(request, 'There was an error in your bid.')
     else:
         form = BidForm()
-    last_bid = bids.first() if bids.exists() else None
     return render(request, 'details.html', {'product': product, 'bids': bids, 'form': form, 'last_bid': last_bid})
     
 
@@ -37,7 +45,6 @@ def post_product(request):
             messages.success(request, 'Product posted successfully!')
             return redirect('home')
         else:
-            print(form.errors)  # Debug: Print form errors to console
             messages.error(request, 'There was an error in the form.')
     else:
         form = ProductForm()
